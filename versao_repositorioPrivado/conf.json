@@ -1,0 +1,16 @@
+
+{
+	"network": {
+		"ssid": "nome da rede wifi",
+		"password": "senha da rede wifi"
+	},
+	"git": {
+		"token": "Insira aqui o token de acesso do Github para utilizar um repositorio privado",
+		"url": "url do repositorio privado do Github",
+        "dir": "src"
+	},
+
+}
+
+
+

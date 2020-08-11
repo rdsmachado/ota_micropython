@@ -1,12 +1,12 @@
 
 {
 	"network": {
-		"ssid": "Roger-2G",
-		"password": "machado1124"
+		"ssid": "nome da rede",
+		"password": "senha da rede"
 	},
 	"git": {
-		"token": "1e38817962f58e8b2bfab24a2c94411f4627bc0c",
-		"url": "https://github.com/exehdamiddleware/gateway_sanep/"
+		"url": "https://github.com/rdsmachado/ota_micropython/",
+        "dir": "src"
 	},
 
 }

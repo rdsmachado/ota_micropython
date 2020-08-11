@@ -11,12 +11,12 @@ import machine
 class Ota_updater:
 # Classe utilizada para realizar o download e update dos codigos com base no projeto privado do github 
 
-    def __init__(self, github_repo, main_dir, module=''):
+    def __init__(self, github_repo, main_dir, module='', headers={}):
     # Metodo de inicializacao
     # @param github_repo: url do GitHub;
     # @param main_dir: pasta onde vao estar os codigos que serao atualizados;
     # @param headers: utilizado para usar projeto privado do GitHub.
-        self.http_client = HttpClient()
+        self.http_client = HttpClient(headers=headers)
         self.github_repo = github_repo.rstrip('/').replace('https://github.com', 'https://api.github.com/repos')
         self.main_dir = main_dir
         self.module = module.rstrip('/')
@@ -170,7 +170,15 @@ class Response:
 
 class HttpClient:
 
+
+    def __init__(self, headers={}):
+        self._headers = headers
+
     def request(self, method, url, data=None, json=None, headers={}, stream=None):
+        def _write_headers(sock, _headers):
+            for k in _headers:
+                sock.write(b'{}: {}\r\n'.format(k, _headers[k]))
+
         try:
             proto, dummy, host, path = url.split('/', 3)
         except ValueError:
@@ -188,11 +196,13 @@ class HttpClient:
             host, port = host.split(':', 1)
             port = int(port)
 
+
         ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
         ai = ai[0]
 
         s = usocket.socket(ai[0], ai[1], ai[2])
         try:
+
             s.connect(ai[-1])
             if proto == 'https:':
                 s = ussl.wrap_socket(s, server_hostname=host)
@@ -200,11 +210,9 @@ class HttpClient:
             if not 'Host' in headers:
                 s.write(b'Host: %s\r\n' % host)
             # Iterate over keys to avoid tuple alloc
-            for k in headers:
-                s.write(k)
-                s.write(b': ')
-                s.write(headers[k])
-                s.write(b'\r\n')
+            _write_headers(s, self._headers)
+            _write_headers(s, headers)
+
             # add user agent
             s.write('User-Agent')
             s.write(b': ')
@@ -220,6 +228,7 @@ class HttpClient:
             s.write(b'\r\n')
             if data:
                 s.write(data)
+
 
             l = s.readline()
             # print(l)
@@ -254,13 +263,16 @@ class HttpClient:
         return self.request('GET', url, **kw)
 
     def post(self, url, **kw):
+
         return self.request('POST', url, **kw)
 
     def put(self, url, **kw):
         return self.request('PUT', url, **kw)
 
+
     def patch(self, url, **kw):
         return self.request('PATCH', url, **kw)
+
 
     def delete(self, url, **kw):
         return self.request('DELETE', url, **kw)

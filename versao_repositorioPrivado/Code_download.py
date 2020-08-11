@@ -21,13 +21,14 @@ class Code_download:
       file_json = ujson.loads(file.read())
       password_wifi = file_json['network']['password'] #: senha da rede wifi
       name_wifi = file_json['network']['ssid'] #: ssid da rede wifi
+      token = file_json['git']['token'] #: token da conta do projeto do GitHub
       url = file_json['git']['url'] #: url do projeto do GitHub
       diretorio = file_json['git']['dir'] #: diretorio que contem os codigos que serao baixados via ota
       
       file.close()
 
 
-      o = Ota_updater(url, diretorio) #: cria o objeto OTA com os dados do projeto privado do GitHub
+      o = Ota_updater(url, diretorio, headers={'Authorization': 'token {}'.format(token)}) #: cria o objeto OTA com os dados do projeto privado do GitHub
 
       sta_if = network.WLAN(network.STA_IF)
       sta_if.active(True)
